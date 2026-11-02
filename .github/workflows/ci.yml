@@ -18,7 +18,10 @@ jobs:
 
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          # Latest patched release, so govulncheck sees current stdlib fixes.
+          # go.mod's "go" line is only the minimum supported version.
+          go-version: stable
+          check-latest: true
 
       - name: Check formatting
         run: |
@@ -54,7 +57,10 @@ jobs:
 
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          # Latest patched release, so govulncheck sees current stdlib fixes.
+          # go.mod's "go" line is only the minimum supported version.
+          go-version: stable
+          check-latest: true
 
       - name: govulncheck
         run: |

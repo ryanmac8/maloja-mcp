@@ -1,0 +1,8 @@
+.git/
+.github/
+templates/
+*.md
+.env*
+.DS_Store
+/maloja-mcp
+coverage.out

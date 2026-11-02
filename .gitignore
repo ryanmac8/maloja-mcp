@@ -1,0 +1,8 @@
+/maloja-mcp
+/dist/
+coverage.out
+.env
+.env.*
+.DS_Store
+.idea/
+.vscode/

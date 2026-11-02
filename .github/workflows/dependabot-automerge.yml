@@ -1,0 +1,78 @@
+name: Dependabot Auto-merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  actions: write
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v3
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      # Check names must match the job `name:` fields in ci.yml.
+      - name: Wait for Lint & Test
+        uses: lewagon/wait-on-check-action@v1.9.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          check-name: 'Lint & Test'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          allowed-conclusions: success
+
+      - name: Wait for Security Audit
+        uses: lewagon/wait-on-check-action@v1.9.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          check-name: 'Security Audit'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          allowed-conclusions: success
+
+      - name: Wait for Docker Build
+        uses: lewagon/wait-on-check-action@v1.9.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          check-name: 'Docker Build'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          allowed-conclusions: success
+
+      - name: Merge GitHub Actions updates
+        id: merge_actions
+        if: steps.metadata.outputs.package-ecosystem == 'github_actions'
+        run: gh pr merge --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge minor/patch Go module and Docker updates
+        id: merge_deps
+        if: |
+          (steps.metadata.outputs.package-ecosystem == 'go_modules' || steps.metadata.outputs.package-ecosystem == 'docker') &&
+          (steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
+           steps.metadata.outputs.update-type == 'version-update:semver-minor')
+        run: gh pr merge --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Pushes made with GITHUB_TOKEN don't trigger other workflows, so the
+      # publish workflow is started explicitly to ship the updated image.
+      - name: Publish image for merged dependency update
+        if: steps.merge_deps.outcome == 'success'
+        run: gh workflow run publish.yml --repo "$GITHUB_REPOSITORY" --ref main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

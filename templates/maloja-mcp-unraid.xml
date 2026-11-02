@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>maloja-mcp</Name>
+  <Repository>ghcr.io/ryanmac8/maloja-mcp:latest</Repository>
+  <Registry>https://github.com/ryanmac8/maloja-mcp/pkgs/container/maloja-mcp</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/ryanmac8/maloja-mcp/issues</Support>
+  <Project>https://github.com/ryanmac8/maloja-mcp</Project>
+  <Overview>Read-only MCP (Model Context Protocol) server for Maloja, the self-hosted scrobble database. Lets Claude and other MCP clients answer questions about your listening history: recent plays, top artists/tracks/albums for any period, listening trends, yearly number ones and per-artist/track/album stats.&#xD;&#xD;Streamable HTTP on the /mcp endpoint. Set MCP_AUTH_TOKEN and send it as "Authorization: Bearer &lt;token&gt;" from your MCP client or gateway.</Overview>
+  <Category>MediaServer:Music Productivity: Tools:</Category>
+  <WebUI/>
+  <TemplateURL>https://raw.githubusercontent.com/ryanmac8/maloja-mcp/main/templates/maloja-mcp-unraid.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/krateng/maloja/master/maloja/web/static/png/favicon_large.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>A running Maloja server (3.x).</Requires>
+  <Config Name="MCP Port" Target="8080" Default="3016" Mode="tcp" Description="Streamable HTTP MCP port. MCP URL: http://[IP]:[PORT]/mcp" Type="Port" Display="always" Required="true" Mask="false">3016</Config>
+  <Config Name="MALOJA_URL" Target="MALOJA_URL" Default="http://maloja:42010" Mode="" Description="Base URL of your Maloja server, reachable from inside this container." Type="Variable" Display="always" Required="true" Mask="false">http://maloja:42010</Config>
+  <Config Name="MALOJA_TIMEZONE" Target="MALOJA_TIMEZONE" Default="UTC" Mode="" Description="IANA time zone used for 'today', 'last_month' etc. and for displayed play times. Should match Maloja's own MALOJA_LOCATION_TIMEZONE." Type="Variable" Display="always" Required="false" Mask="false">UTC</Config>
+  <Config Name="MCP_AUTH_TOKEN" Target="MCP_AUTH_TOKEN" Default="" Mode="" Description="Bearer token required on /mcp. Strongly recommended. Generate one with: openssl rand -hex 32" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+  <Config Name="MALOJA_API_KEY" Target="MALOJA_API_KEY" Default="" Mode="" Description="Optional Maloja API key. Not needed for the read-only endpoints this server uses on a default Maloja install." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+</Container>

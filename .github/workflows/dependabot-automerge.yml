@@ -12,7 +12,9 @@ permissions:
 
 jobs:
   auto-merge:
-    if: github.actor == 'dependabot[bot]'
+    # PR author, not github.actor: a close/reopen or re-run by a human must
+    # still be treated as a Dependabot PR.
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
 
     steps:

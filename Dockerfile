@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build stage: static, CGO-free binary, cross-compiled for the target platform.
-FROM --platform=$BUILDPLATFORM golang:1.26-bookworm AS builder
+FROM --platform=$BUILDPLATFORM golang:1.27-bookworm AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
